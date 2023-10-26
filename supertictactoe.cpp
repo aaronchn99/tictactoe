@@ -75,6 +75,7 @@ int main() {
             displayBigBoard(board);
             return 0;
         }
+        // Continue game
         a = x; b = y;
         (player == 1) ? player++ : player--;
         cout << "Checking if grid (" << a+1 << ", " << b+1 << ") can be played..." << endl;
