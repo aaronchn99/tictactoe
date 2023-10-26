@@ -42,12 +42,36 @@ int main() {
             goto inputCell;
         }
         board[3*b+a][y*3+x] = player;
+        /* Check win/draw states */
         if (checkWin(player, board[3*b+a]))
             cout << "Yaass! Player " << PLAYER_KEY[player] << " has won and claimed grid (" << a+1 << ", " << b+1 << ")" << endl;
         else if (checkDraw(board[3*b+a]))
             cout << "Eh... Grid (" << a+1 << ", " << b+1 << ") results in a draw. This means both players claim it" << endl;
         if (checkGameWin(player, board)) {
             cout << "Yaaaassss!!! Player " << PLAYER_KEY[player] << " has won the game! Congrats!" << endl;
+            displayBigBoard(board);
+            return 0;
+        }
+        // Check if all grids have been claimed. If so, winner goes to the most claimed grids
+        uint8_t p1Count, p2Count = 0;
+        for (int i=0; i<9; i++) {
+            if (checkWin(1, board[i])) p1Count++;
+            else if (checkWin(2, board[i])) p2Count++;
+            else if (checkDraw(board[i])) p1Count++, p2Count++;
+            else {  // Grid not yet claimed, so game is still on
+                p1Count = p2Count = 0; break;
+            } 
+        }
+        if (p1Count > p2Count) {
+            cout << "Yaaaassss!!! Player " << PLAYER_KEY[1] << " has won the game by having the most claims! Congrats!" << endl;
+            displayBigBoard(board);
+            return 0;
+        } else if (p1Count < p2Count) {
+            cout << "Yaaaassss!!! Player " << PLAYER_KEY[2] << " has won the game by having the most claims! Congrats!" << endl;
+            displayBigBoard(board);
+            return 0;
+        } else if (p1Count > 0 && p2Count > 0) {
+            cout << "Eh... It's a draw" << endl;
             displayBigBoard(board);
             return 0;
         }
