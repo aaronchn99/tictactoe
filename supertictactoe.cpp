@@ -7,11 +7,12 @@ void displayDrawGrid(uint8_t line);
 bool checkGameWin(uint8_t player, uint8_t** board);
 
 uint8_t** board;
+coord inputCoord;
 
 int main() {
     uint8_t x, y, a, b;    // a, b is the coord of the outer grid
     uint8_t player = 1;
-    coord inputCoord;
+    inputCoord.x, inputCoord.y = 20;
     board = new uint8_t*[9];
     for (int i=0;i<9;i++)
         board[i] = new uint8_t[9]();
@@ -95,6 +96,7 @@ void displayBigBoard(uint8_t** board) {
     for (int i=0; i<3; i++) {
         for (int l=0; l<=6; l++) {  // Iterates over each line of sub grid image
             for (int j=0; j<3; j++) {
+                cout << ((inputCoord.y == i && inputCoord.x == j) ? '|' : ' ');
                 if (checkWin(1, board[3*i+j]))
                     displayWinGrid(1, l);
                 else if (checkWin(2, board[3*i+j]))
@@ -103,7 +105,7 @@ void displayBigBoard(uint8_t** board) {
                     displayDrawGrid(l);
                 else
                     displayBoardLine(board[3*i+j], l);
-                if (j<2) cout << ' ';
+                cout << ((inputCoord.y == i && inputCoord.x == j) ? '|' : ' ');
             }
             cout << endl;
         }
