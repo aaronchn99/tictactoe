@@ -1,4 +1,5 @@
 #include "common.h"
+#include "ai.h"
 
 void displayWelcome();
 void displayBoard(uint8_t* board);
@@ -6,8 +7,11 @@ uint8_t playHuman(uint8_t* board, char playerKey);
 uint8_t playCPU(uint8_t* board);
 
 uint8_t* board;
+Node* GameTreeRoot;
+Node* currentTreeNode;
 
 int main() {
+    GameTreeRoot = currentTreeNode = buildTree();
     srand(time(nullptr));
     uint8_t currentPlayer = 1;
     bool isWin = false;
@@ -39,14 +43,26 @@ uint8_t playHuman(uint8_t* board, char playerKey) {
         if (board[cell] > 0)
             cout << "That cell has been filled in, select another one" << endl;
     } while (board[cell] > 0);
+    for (int i=0; i < currentTreeNode->childrenTail; i++)
+        if (currentTreeNode->children[i]->move == cell)
+            currentTreeNode = currentTreeNode->children[i];
     return cell;
 }
 
 uint8_t playCPU(uint8_t* board) {
     int cell;
+    Node* bestMove = nullptr;
     do {
-        cell = 9*((float) rand()/RAND_MAX);
-    } while (board[cell] > 0); 
+        for (int i=0; i < currentTreeNode->childrenTail; i++) {
+            if (bestMove == nullptr
+                    || currentTreeNode->d%2 == 0 && currentTreeNode->children[i]->score > bestMove->score
+                    || currentTreeNode->d%2 == 1 && currentTreeNode->children[i]->score < bestMove->score
+                    || currentTreeNode->children[i]->score == bestMove->score && 10*((float) rand()/RAND_MAX) < 5)
+                bestMove = currentTreeNode->children[i];
+        }
+        cell = bestMove->move;
+    } while (board[cell] > 0);
+    currentTreeNode = bestMove; 
     return cell;
 }
 
