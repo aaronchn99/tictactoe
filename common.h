@@ -1,3 +1,5 @@
+#ifndef COMMON_H
+#define COMMON_H
 #include <iostream>
 #include <string>
 #include <stdexcept>
@@ -78,3 +80,4 @@ bool checkDraw(uint8_t* board) {
         if (board[i] == 0) return false;
     return true;
 }
+#endif
