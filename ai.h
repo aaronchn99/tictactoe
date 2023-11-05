@@ -1,7 +1,7 @@
 #ifndef AI_H
 #define AI_H
 #include "common.h"
-#include <queue>
+#include <unordered_map>
 using namespace std;
 
 /* Random Play */
@@ -16,6 +16,7 @@ uint8_t randomPlay(uint8_t* board) {
 /* Full Game Tree */
 class Node {
 public:
+    static unordered_map<string, Node*> NodeMap;
     int move;
     Node* parent;
     Node** children = new Node*[9]();
@@ -28,13 +29,20 @@ public:
         }
     }
     void expandNode(uint8_t* board, int player) {
+        if (NodeMap.find(boardToString(board)) != NodeMap.end()) {
+            score = NodeMap.find(boardToString(board))->second->score;
+            return;
+        }
+        NodeMap[boardToString(board)] = this;
         if (checkWin(1, board)) {
             score = 10-d;
             return;
-        } else if (checkWin(2, board)) {
+        }
+        if (checkWin(2, board)) {
             score = d-10;
             return;
-        } else if (checkDraw(board)) {
+        }
+        if (checkDraw(board)) {
             score = 0;
             return;
         }
@@ -51,20 +59,16 @@ public:
             }
         }
     };
+    static Node* buildTree() {
+        uint8_t* board = new uint8_t[9]();
+        Node* root = new Node(-1);
+        root->expandNode(board, 1);
+        return root;
+    }
 };
+unordered_map<string, Node*> Node::NodeMap = unordered_map<string, Node*>();
 
 ostream& operator <<(ostream &os, const Node &n) {
     return (os << "(" << n.move << " : " << n.score << ")");
 }
-
-Node* buildTree() {
-    uint8_t* board = new uint8_t[9]();
-    Node* root = new Node(-1);
-    root->expandNode(board, 1);
-    return root;
-}
-
-
-
-
 #endif

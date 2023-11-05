@@ -80,4 +80,12 @@ bool checkDraw(uint8_t* board) {
         if (board[i] == 0) return false;
     return true;
 }
+
+string boardToString(uint8_t* board) {
+    string result = "";
+    for (int i=0; i<9; i++) {
+        result += to_string(board[i]);
+    }
+    return result;
+}
 #endif
