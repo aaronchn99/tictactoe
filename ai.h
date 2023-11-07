@@ -65,6 +65,26 @@ public:
         root->expandNode(board, 1);
         return root;
     }
+    static void printTree(Node* root, int max_depth) {
+        queue<Node*> NodeQueue;
+        Node* node;
+        int d = 0;
+        NodeQueue.push(root);
+        while (!NodeQueue.empty()) {
+            node = NodeQueue.front();
+            NodeQueue.pop();
+            if (d < node->d) {
+                cout << endl;
+                d = node->d;
+            }
+            cout << "(" << node->move << " : " << node->score << ")";
+            if (d < max_depth) {
+                for (int i=0;i<node->childrenTail;i++){
+                    NodeQueue.push(node->children[i]);
+                }
+            }
+        }
+    }
 };
 unordered_map<string, Node*> Node::NodeMap = unordered_map<string, Node*>();
 
