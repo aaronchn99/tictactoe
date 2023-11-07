@@ -2,6 +2,8 @@
 #define AI_H
 #include "common.h"
 #include <unordered_map>
+#include <climits>
+#include <queue>
 using namespace std;
 
 /* Random Play */
@@ -23,12 +25,13 @@ public:
     int childrenTail = 0;
     int score;
     int d = 0;
+    bool incomplete = false;
     Node(int move, Node* parent=nullptr) : move(move), parent(parent) {
         if (parent != nullptr) {
             d = parent->d + 1;
         }
     }
-    void expandNode(uint8_t* board, int player) {
+    void expandNode(uint8_t* board, int player, int a=INT_MIN, int b=INT_MAX) {
         if (NodeMap.find(boardToString(board)) != NodeMap.end()) {
             score = NodeMap.find(boardToString(board))->second->score;
             return;
@@ -46,23 +49,36 @@ public:
             score = 0;
             return;
         }
+        score = (player == 1) ? INT_MIN : INT_MAX;
         for (int i=0; i<9; i++) {
             if (board[i] != 0) continue;
             board[i] = player;
             Node* child = new Node(i, this);
             children[childrenTail++] = child;
-            child->expandNode(board, (player == 1) ? player+1 : player-1);
+            child->expandNode(board, (player == 1) ? player+1 : player-1, a, b);
             board[i] = 0;
-            // Player 1 is Maximin, Player 2 is minimax
-            if (childrenTail == 1 || d%2 == 1 && child->score < score || d%2 == 0 && child->score > score) {
-                score = child->score;
+            // Alpha/Beta cutoff
+            if (player == 1) {
+                score = max(score, child->score);
+                if (score > b) {
+                    incomplete = true;
+                    return;
+                }
+                a = max(a, score);
+            } else {
+                score = min(score, child->score);
+                if (score < a) {
+                    incomplete = true;
+                    return;
+                }
+                b = min(b, score);
             }
+            // Player 1 is Maximising, Player 2 is Minimising
         }
     };
-    static Node* buildTree() {
+    static Node* buildTree(Node* root = new Node(-1), int player = 1) {
         uint8_t* board = new uint8_t[9]();
-        Node* root = new Node(-1);
-        root->expandNode(board, 1);
+        root->expandNode(board, player);
         return root;
     }
     static void printTree(Node* root, int max_depth) {
