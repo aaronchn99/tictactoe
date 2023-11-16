@@ -49,6 +49,8 @@ uint8_t playCPU(uint8_t* board) {
     int cell;
     Node* bestMove = nullptr;
     Node* currentTreeNode = Node::NodeMap.find(boardToString(board))->second;
+    // Expand if node is pruned
+    if (currentTreeNode->incomplete) currentTreeNode->expandNode(board, currentTreeNode->d%2 + 1);
     do {
         for (int i=0; i < currentTreeNode->childrenTail; i++) {
             if (bestMove == nullptr
@@ -59,6 +61,8 @@ uint8_t playCPU(uint8_t* board) {
         }
         cell = bestMove->move;
     } while (board[cell] > 0);
+    // Expand if node is pruned
+    if (bestMove->incomplete) bestMove->expandNode(board, bestMove->d%2 + 1);
     return cell;
 }
 

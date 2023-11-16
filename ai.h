@@ -25,7 +25,7 @@ public:
     int childrenTail = 0;
     int score;
     int d = 0;
-    bool incomplete = false;
+    bool incomplete = false;    // Flags if node has been pruned
     Node(int move, Node* parent=nullptr) : move(move), parent(parent) {
         if (parent != nullptr) {
             d = parent->d + 1;
